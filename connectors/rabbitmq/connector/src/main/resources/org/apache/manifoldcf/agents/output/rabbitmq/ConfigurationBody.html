@@ -1,0 +1,55 @@
+
+#if($TabName == 'Parameters')
+
+<table class="displaytable">
+    <tr>
+        <td class="description">
+            <nobr>Queue name:</nobr>
+        </td>
+        <td class="value"><input name="queue" type="text"
+                                 value="$Encoder.attributeEscape($queue)" size="48" />
+        </td>
+    </tr>
+    <tr>
+        <td class="description"><nobr>Host: </nobr></td>
+        <td class="value"><input name="host" type="text" value="$Encoder.attributeEscape($host)"
+                                 size="24" /></td>
+    </tr>
+    <tr>
+        <td class="description"><nobr>Port: </nobr></td>
+        <td class="value"><input name="port" type="text" value="$Encoder.attributeEscape($port)"
+                                 size="24" /></td>
+    </tr>
+    <tr>
+        <td class="description"><nobr>Is queue durable: </nobr></td>
+        <td class="value"><input name="durable" type="text" value="$Encoder.attributeEscape($durable)"
+                                 size="24" /></td>
+    </tr>
+    <tr>
+        <td class="description"><nobr>Exclusive parameter: </nobr></td>
+        <td class="value"><input name="exclusive" type="text" value="$Encoder.attributeEscape($exclusive)"
+                                 size="24" /></td>
+    </tr>
+    <tr>
+        <td class="description"><nobr>Autodelete parameter: </nobr></td>
+        <td class="value"><input name="autodelete" type="text" value="$Encoder.attributeEscape($autodelete)"
+                                 size="24" /></td>
+    </tr>
+    <tr>
+        <td class="description"><nobr>Use Transactions: </nobr></td>
+        <td class="value"><input name="usetransactions" type="text" value="$Encoder.attributeEscape($usetransactions)"
+                                 size="24" /></td>
+    </tr>
+</table>
+
+#else
+
+<input type="hidden" name="queue" value="$Encoder.attributeEscape($queue)" />
+<input type="hidden" name="host" value="$Encoder.attributeEscape($host)" />
+<input type="hidden" name="host" value="$Encoder.attributeEscape($port)" />
+<input type="hidden" name="durable" value="$Encoder.attributeEscape($durable)" />
+<input type="hidden" name="exclusive" value="$Encoder.attributeEscape($exclusive)" />
+<input type="hidden" name="autodelete" value="$Encoder.attributeEscape($autodelete)" />
+<input type="hidden" name="usetransactions" value="$Encoder.attributeEscape($usetransactions)" />
+
+#end

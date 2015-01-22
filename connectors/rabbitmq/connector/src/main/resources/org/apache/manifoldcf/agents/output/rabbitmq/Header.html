@@ -1,0 +1,64 @@
+
+
+<script type="text/javascript">
+
+function checkConfigForSave()
+{
+  if (editconnection.queue){
+    if (editconnection.queue.value == "")
+    {
+        alert("Enter a queue name.");
+        SelectTab("Parameters");
+        editconnection.queue.focus();
+        return false;
+    }
+  }
+  if (editconnection.host){
+    if (editconnection.host.value == "")
+    {
+        alert("Enter a host.");
+        SelectTab("Parameters");
+        editconnection.host.focus();
+        return false;
+    }
+  }
+  if (editconnection.durable){
+    if (editconnection.durable.value == "")
+    {
+        alert("Enter a durable parameter.");
+        SelectTab("Parameters");
+        editconnection.durable.focus();
+        return false;
+    }
+  }
+  if (editconnection.autodelete){
+    if (editconnection.autodelete.value == "")
+    {
+        alert("Enter an autodelete parameter.");
+        SelectTab("Parameters");
+        editconnection.autodelete.focus();
+        return false;
+    }
+  }
+  if (editconnection.exclusive){
+    if (editconnection.exclusive.value == "")
+    {
+        alert("Enter an exclusive parameter.");
+        SelectTab("Parameters");
+        editconnection.exclusive.focus();
+        return false;
+    }
+  }
+  if (editconnection.usetransaction){
+    if (editconnection.usetransaction.value == "")
+    {
+        alert("Enter a useTransaction parameter.");
+        SelectTab("Parameters");
+        editconnection.usetransaction.focus();
+        return false;
+    }
+  }
+  return true;
+}
+
+</script>
