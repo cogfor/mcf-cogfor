@@ -86,6 +86,7 @@
     <poi.version>3.11-beta2</poi.version>
     <tika.version>1.6</tika.version>
     <boilerpipe.version>1.1.0</boilerpipe.version>
+    <rabbitmq.version>3.4.3</rabbitmq.version>
   </properties>
 
   <modules>
