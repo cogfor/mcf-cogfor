@@ -13,3 +13,7 @@ build
 *.jar
 framework/dist
 dist
+connectors/elasticsearch/test-materials/elasticsearch-1.0.1/
+lib
+site/fonts
+*.war
