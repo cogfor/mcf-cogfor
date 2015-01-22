@@ -1,0 +1,15 @@
+*~
+target
+.classpath
+.project
+.settings
+build.properties
+*.iml
+*.iws
+*.ipr
+.idea
+build
+*.class
+*.jar
+framework/dist
+dist
