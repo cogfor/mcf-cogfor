@@ -20,7 +20,7 @@ package org.apache.manifoldcf.agents.output.rabbitmq;
 
 import org.apache.manifoldcf.core.interfaces.ConfigParams;
 import org.apache.manifoldcf.core.interfaces.IPostParameters;
-import org.apache.manifoldcf.agents.system.Logging;
+import org.apache.manifoldcf.crawler.system.Logging;
 
 public class RabbitmqConfig {
     public static final String hostParameter = "host";
