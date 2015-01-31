@@ -24,7 +24,6 @@ import org.apache.manifoldcf.crawler.system.Logging;
 
 public class RabbitmqConfig {
     public static final String hostParameter = "host";
-    public static final String portParameter = "port";
     public static final String queueParameter = "queue";
     public static final String durableParameter = "durable";
     public static final String autoDeleteParameter = "autodelete";
@@ -33,7 +32,8 @@ public class RabbitmqConfig {
 
     private String queueName = "manifoldcf";
     private String host = "localhost";
-    private int port = 5672;
+
+    private int port=5672;
 
     private boolean durable = true;
     private boolean exclusive = false;
@@ -43,25 +43,18 @@ public class RabbitmqConfig {
 
     RabbitmqConfig(ConfigParams configParams) {
         this.host = configParams.getParameter(hostParameter);
-        // TODO: this.port = configParams.get
         this.queueName = configParams.getParameter(queueParameter);
         extractAutoDeleteParameter(configParams);
         extractExclusiveParameter(configParams);
         extractDurableParameter(configParams);
     }
 
-    public static void contextToConfig(IPostParameters variableContext, ConfigParams parameters) {
+    public final static void contextToConfig(IPostParameters variableContext, ConfigParams parameters) {
 
         String host = variableContext.getParameter(hostParameter);
 
         if (host != null) {
             parameters.setParameter(hostParameter, host);
-        }
-
-        String port = variableContext.getParameter(portParameter);
-
-        if (port != null) {
-            parameters.setParameter(portParameter, port);
         }
 
         String queue = variableContext.getParameter(queueParameter);
@@ -113,7 +106,7 @@ public class RabbitmqConfig {
             Logging.connectors.debug("Channel parameter durable set to " + this.durable);
         }
         else {
-            this.autoDelete = true;
+            this.durable = true;
 
             Logging.connectors.debug("Channel parameter durable parameter not set, defaults to " + this.durable);
         }

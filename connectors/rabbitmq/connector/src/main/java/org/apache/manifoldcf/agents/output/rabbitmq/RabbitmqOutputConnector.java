@@ -23,6 +23,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.MessageProperties;
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.JDKSaslConfig;
 
 import org.apache.manifoldcf.core.interfaces.*;
 import org.apache.manifoldcf.agents.interfaces.*;
@@ -99,8 +100,10 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
             throws ManifoldCFException
     {
         try {
-            channel.close();
-            connection.close();
+            if (channel != null) {
+                channel.close();
+                connection.close();
+            }
         }
         catch (IOException e){
             Logging.ingest.warn("Disconnection error: " + e.getMessage(), e);
@@ -120,8 +123,12 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
                     ConfigParams configParams = getConfiguration();
                     this.rabbitconfig = new RabbitmqConfig(configParams);
                 }
+
                 //Create a channel:
                 factory.setHost(rabbitconfig.getHost());
+                factory.setPort(rabbitconfig.getPort());
+                factory.setUsername("admin");
+                factory.setPassword("1234HvPa");
                 connection = factory.newConnection();
                 channel = connection.createChannel();
             }
@@ -295,11 +302,20 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
 
             //Declare a queue for publish:
             Boolean durable = rabbitconfig.isDurable();
-            channel.queueDeclare(QUEUE_NAME, durable, true, true, null);
+            Boolean exclusive = rabbitconfig.isExclusive();
+            Boolean autodelete = rabbitconfig.isAutoDelete();
+            channel.queueDeclare(QUEUE_NAME, durable, exclusive, autodelete, null);
 
             //Publish the content of the document:
-            channel.basicPublish("",QUEUE_NAME, MessageProperties.PERSISTENT_TEXT_PLAIN, outString.getBytes());
-
+            Boolean useTransactions = rabbitconfig.isUseTransactions();
+            if (useTransactions){
+                channel.txSelect();
+                channel.basicPublish("", QUEUE_NAME, MessageProperties.PERSISTENT_BASIC, outString.getBytes());
+                channel.txCommit();
+            }
+            else {
+                channel.basicPublish("", QUEUE_NAME, MessageProperties.PERSISTENT_TEXT_PLAIN, outString.getBytes());
+            }
             //For debugging purposes:
             System.out.println("Sent:   " + outString);
 
