@@ -213,6 +213,7 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         Messages.outputResourceWithVelocity(out, locale, "ConfigurationBody.html", velocityContext, false);
     }
 
+
     @Override
     public String processConfigurationPost(IThreadContext threadContext,
                                            IPostParameters variableContext, ConfigParams parameters)

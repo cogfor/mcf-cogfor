@@ -33,7 +33,7 @@ public class RabbitmqConfig {
     private String queueName = "manifoldcf";
     private String host = "localhost";
 
-    private int port=5672;
+    private int port;
 
     private boolean durable = true;
     private boolean exclusive = false;
@@ -106,7 +106,7 @@ public class RabbitmqConfig {
             Logging.connectors.debug("Channel parameter durable set to " + this.durable);
         }
         else {
-            this.durable = true;
+            this.autoDelete = true;
 
             Logging.connectors.debug("Channel parameter durable parameter not set, defaults to " + this.durable);
         }
