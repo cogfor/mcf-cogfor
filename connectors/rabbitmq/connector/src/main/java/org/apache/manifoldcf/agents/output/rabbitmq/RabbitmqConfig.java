@@ -22,14 +22,40 @@ import org.apache.manifoldcf.core.interfaces.ConfigParams;
 import org.apache.manifoldcf.core.interfaces.IPostParameters;
 import org.apache.manifoldcf.crawler.system.Logging;
 
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+
+class Parameters{
+    public enum RabbitParameters  {
+        hostParameter, queueParameter, durableParameter, autoDeleteParameter, exclusiveParameter, transactionParameter
+    }
+
+    public EnumMap<RabbitParameters, String> paramMap = new EnumMap<RabbitParameters, String>(RabbitParameters.class);
+
+    Parameters(){
+        paramMap.put(RabbitParameters.hostParameter, "host");
+        paramMap.put(RabbitParameters.queueParameter, "queue");
+        paramMap.put(RabbitParameters.durableParameter, "durable");
+        paramMap.put(RabbitParameters.autoDeleteParameter, "autodelete");
+        paramMap.put(RabbitParameters.exclusiveParameter, "exclusive");
+        paramMap.put(RabbitParameters.transactionParameter, "transaction");
+    }
+}
+
 public class RabbitmqConfig {
+
+
+
+
+/*
     public static final String hostParameter = "host";
     public static final String queueParameter = "queue";
     public static final String durableParameter = "durable";
     public static final String autoDeleteParameter = "autodelete";
     public static final String exclusiveParameter = "exclusive";
     public static final String transactionParameter = "transaction";
-
+*/
     private String queueName = "manifoldcf";
     private String host = "localhost";
 
