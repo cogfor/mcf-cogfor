@@ -265,6 +265,38 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
      *@param activities is the handle to an object that the implementer of an output connector may use to perform operations, such as logging processing activity.
      *@return the document status (accepted or permanently rejected).
      */
+
+
+    /**
+     * Convert an unqualified ACL to qualified form.
+     *
+     * @param acl
+     *          is the initial, unqualified ACL.
+     * @param authorityNameString
+     *          is the name of the governing authority for this document's acls,
+     *          or null if none.
+     * @param activities
+     *          is the activities object, so we can report what's happening.
+     * @return the modified ACL.
+     */
+    protected static String[] convertACL(String[] acl,
+                                         String authorityNameString, IOutputAddActivity activities)
+            throws ManifoldCFException
+    {
+        if (acl != null)
+        {
+            String[] rval = new String[acl.length];
+            int i = 0;
+            while (i < rval.length)
+            {
+                rval[i] = activities.qualifyAccessToken(authorityNameString, acl[i]);
+                i++;
+            }
+            return rval;
+        }
+        return new String[0];
+    }
+
     @Override
     public int addOrReplaceDocumentWithException(String documentURI, VersionContext outputDescription, RepositoryDocument document, String authorityNameString, IOutputAddActivity activities)
             throws ManifoldCFException, ServiceInterruption, IOException
@@ -274,7 +306,30 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         long startTime = System.currentTimeMillis();
 
         // Check ACL's.
+        String[] acls = null;
+        String[] denyAcls = null;
+        String[] shareAcls = null;
+        String[] shareDenyAcls = null;
+        Iterator <String> iterator = document.securityTypesIterator();
+        while (iterator.hasNext()){
+            String securityType = iterator.next();
+            String[] convertedAcls = convertACL(document.getSecurityACL(securityType), authorityNameString, activities);
+            String[] convertedDenyAcls = convertACL(document.getSecurityDenyACL(securityType), authorityNameString, activities);
+            if (securityType.equals(RepositoryDocument.SECURITY_TYPE_DOCUMENT)){
+                acls = convertedAcls;
+                denyAcls = convertedDenyAcls;
+            }
+            if(securityType.equals(RepositoryDocument.SECURITY_TYPE_SHARE)){
+                shareAcls = convertedAcls;
+                shareDenyAcls = convertedDenyAcls;
+            }
+            else{
+                Logging.ingest.warn("Unhandled security type" + securityType);
+                result = "Document rejected.";
+                activities.recordActivity(null, INGEST_ACTIVITY, new Long(document.getBinaryLength()), documentURI, result, null);
+            }
 
+        }
 
         // Fill an OutboundDocument instance.
         OutboundDocument outboundDocument = new OutboundDocument(document);
