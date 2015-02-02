@@ -22,31 +22,8 @@ import org.apache.manifoldcf.core.interfaces.ConfigParams;
 import org.apache.manifoldcf.core.interfaces.IPostParameters;
 import org.apache.manifoldcf.crawler.system.Logging;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
 
-class Parameters{
-    public enum RabbitParameters  {
-        hostParameter, queueParameter, durableParameter, autoDeleteParameter, exclusiveParameter, transactionParameter
-    }
-
-    public EnumMap<RabbitParameters, String> paramMap = new EnumMap<RabbitParameters, String>(RabbitParameters.class);
-
-    Parameters(){
-        paramMap.put(RabbitParameters.hostParameter, "host");
-        paramMap.put(RabbitParameters.queueParameter, "queue");
-        paramMap.put(RabbitParameters.durableParameter, "durable");
-        paramMap.put(RabbitParameters.autoDeleteParameter, "autodelete");
-        paramMap.put(RabbitParameters.exclusiveParameter, "exclusive");
-        paramMap.put(RabbitParameters.transactionParameter, "transaction");
-    }
-}
-
-public class RabbitmqConfig {
-
-
-
+public class RabbitmqConfig extends RabbitParameters{
 
 /*
     public static final String hostParameter = "host";
@@ -55,130 +32,66 @@ public class RabbitmqConfig {
     public static final String autoDeleteParameter = "autodelete";
     public static final String exclusiveParameter = "exclusive";
     public static final String transactionParameter = "transaction";
-*/
+
     private String queueName = "manifoldcf";
     private String host = "localhost";
 
-    private int port;
+    private String defaultPort = "5672";
 
-    private boolean durable = true;
-    private boolean exclusive = false;
-    private boolean autoDelete = false;
-    private boolean useTransactions = false;
-
+    private String defaultDurable = "true";
+    private String defaultExclusive = "false";
+    private String defaultAutoDelete = "false";
+    private String defaultUseTransactions = "false";
+*/
+    private static Parameters[] PARAMETERSLIST = {Parameters.host, Parameters.queue, Parameters.durable, Parameters.autodelete,
+                                                    Parameters.port, Parameters.exclusive, Parameters.transaction};
 
     RabbitmqConfig(ConfigParams configParams) {
-        this.host = configParams.getParameter(hostParameter);
-        this.queueName = configParams.getParameter(queueParameter);
-        extractAutoDeleteParameter(configParams);
-        extractExclusiveParameter(configParams);
-        extractDurableParameter(configParams);
+        super(Parameters.class);
+        for (Parameters parameters : PARAMETERSLIST){
+            String p = configParams.getParameter(parameters.name());
+            put(parameters, p);
+        }
     }
 
     public final static void contextToConfig(IPostParameters variableContext, ConfigParams parameters) {
-
-        String host = variableContext.getParameter(hostParameter);
-
-        if (host != null) {
-            parameters.setParameter(hostParameter, host);
-        }
-
-        String queue = variableContext.getParameter(queueParameter);
-
-        if (queue != null) {
-            parameters.setParameter(queueParameter, queue);
-        }
-
-        String _autodelete = variableContext.getParameter(autoDeleteParameter);
-
-        if (_autodelete != null) {
-            parameters.setParameter(autoDeleteParameter, _autodelete);
-        }
-
-        String _durable = variableContext.getParameter(durableParameter);
-
-        if (_durable != null) {
-            parameters.setParameter(durableParameter, _durable);
-        }
-
-        String _exclusive = variableContext.getParameter(_durable);
-
-        if (_exclusive != null) {
-            parameters.setParameter(exclusiveParameter, _exclusive);
-        }
-    }
-
-    private void extractAutoDeleteParameter(ConfigParams variableContext) {
-
-        String _active = variableContext.getParameter(autoDeleteParameter);
-
-        if (_active != null) {
-            this.autoDelete = Boolean.parseBoolean(_active);
-            Logging.connectors.debug("Channel parameter active set to " + this.autoDelete);
-        }
-        else {
-            this.autoDelete = false;
-
-            Logging.connectors.debug("Channel parameter active parameter not set, defaults to " + this.autoDelete);
-        }
-    }
-
-    private void extractDurableParameter(ConfigParams variableContext) {
-
-        String _durable = variableContext.getParameter(durableParameter);
-
-        if (_durable != null) {
-            this.durable = Boolean.parseBoolean(_durable);
-            Logging.connectors.debug("Channel parameter durable set to " + this.durable);
-        }
-        else {
-            this.autoDelete = true;
-
-            Logging.connectors.debug("Channel parameter durable parameter not set, defaults to " + this.durable);
-        }
-    }
-
-    private void extractExclusiveParameter(ConfigParams variableContext) {
-
-        String _exclusive = variableContext.getParameter(exclusiveParameter);
-
-        if (_exclusive != null) {
-            this.exclusive = Boolean.parseBoolean(_exclusive);
-
-            Logging.connectors.debug("Channel parameter exclusive set to " + this.exclusive);
-        }
-        else {
-            this.exclusive = false;
-
-            Logging.connectors.debug("Channel parameter exclusive parameter not set, defaults to " + this.exclusive);
+        for (Parameters parameter : PARAMETERSLIST){
+            String p = variableContext.getParameter(parameter.name());
+            if (p != null){
+                parameters.setParameter(parameter.name(), p);
+            }
         }
     }
 
     public String getQueueName() {
-        return queueName;
+        return get(Parameters.queue);
     }
 
     public String getHost() {
-        return host;
+        return get(Parameters.host);
     }
 
-    public int getPort() {
-        return port;
+    public Integer getPort() {
+        String portParam = get(Parameters.port);
+        if(portParam == null){
+            portParam = "5672";
+        }
+        return Integer.parseInt(portParam);
     }
 
     public boolean isDurable() {
-        return durable;
+        return Boolean.parseBoolean(get(Parameters.durable));
     }
 
     public boolean isExclusive() {
-        return exclusive;
+        return Boolean.parseBoolean(get(Parameters.exclusive));
     }
 
     public boolean isAutoDelete() {
-        return autoDelete;
+        return Boolean.parseBoolean(get(Parameters.autodelete));
     }
 
     public boolean isUseTransactions() {
-        return useTransactions;
+        return Boolean.parseBoolean(get(Parameters.transaction));
     }
 }

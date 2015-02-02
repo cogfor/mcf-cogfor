@@ -230,12 +230,14 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         velocityContext.put("host", host);
         Boolean durable = rabbitmqConfig.isDurable();
         velocityContext.put("durable", durable.toString());
+        Integer port = rabbitmqConfig.getPort();
+        velocityContext.put("port", port.toString());
         Boolean exclusive = rabbitmqConfig.isExclusive();
         velocityContext.put("exclusive", exclusive.toString());
         Boolean autodelete = rabbitmqConfig.isAutoDelete();
         velocityContext.put("autodelete", autodelete.toString());
         Boolean usetransactions = rabbitmqConfig.isUseTransactions();
-        velocityContext.put("usetransactions", usetransactions.toString());
+        velocityContext.put("transaction", usetransactions.toString());
         //Terminar función, llamarla en configurationBody y viewConfiguration. Quizás también en configurationHeader, ver esto.
 
     }
