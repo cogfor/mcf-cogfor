@@ -4,6 +4,24 @@
 
 function checkConfigForSave()
 {
+  if (editconnection.username){
+    if (editconnection.username.value == "")
+    {
+        alert("Enter a username.");
+        SelectTab("Parameters");
+        editconnection.username.focus();
+        return false;
+    }
+  }
+  if (editconnection.password){
+    if (editconnection.password.value == "")
+    {
+        alert("Enter a password.");
+        SelectTab("Parameters");
+        editconnection.password.focus();
+        return false;
+    }
+  }
   if (editconnection.queue){
     if (editconnection.queue.value == "")
     {

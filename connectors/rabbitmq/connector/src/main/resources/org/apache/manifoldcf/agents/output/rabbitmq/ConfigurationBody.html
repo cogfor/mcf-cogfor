@@ -3,6 +3,16 @@
 
 <table class="displaytable">
     <tr>
+        <td class="description"><nobr>Username: </nobr></td>
+        <td class="value"><input name="username" type="text" value="$Encoder.attributeEscape($username)"
+                                 size="24" /></td>
+    </tr>
+    <tr>
+        <td class="description"><nobr>Password: </nobr></td>
+        <td class="value"><input name="password" type="text" value="$Encoder.attributeEscape($password)"
+                                 size="24" /></td>
+    </tr>
+    <tr>
         <td class="description">
             <nobr>Queue name:</nobr>
         </td>
@@ -44,6 +54,8 @@
 
    #else
 
+<input type="hidden" name="username" value="$Encoder.attributeEscape($username)" />
+<input type="hidden" name="password" value="$Encoder.attributeEscape($password)" />
 <input type="hidden" name="queue" value="$Encoder.attributeEscape($queue)" />
 <input type="hidden" name="host" value="$Encoder.attributeEscape($host)" />
 <input type="hidden" name="port" value="$Encoder.attributeEscape($port)" />

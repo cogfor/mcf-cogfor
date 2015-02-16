@@ -127,8 +127,8 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
                 //Create a channel:
                 factory.setHost(rabbitconfig.getHost());
                 factory.setPort(rabbitconfig.getPort());
-                factory.setUsername("admin");
-                factory.setPassword("1234HvPa");
+                factory.setUsername(rabbitconfig.getUserName());
+                factory.setPassword(rabbitconfig.getPassword());
                 connection = factory.newConnection();
                 channel = connection.createChannel();
             }
@@ -224,6 +224,10 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
 
     // Fills a hashmap with configuration information.
     private static void configToContext (Map<String, String> velocityContext, RabbitmqConfig rabbitmqConfig){
+        String username = rabbitmqConfig.getUserName();
+        velocityContext.put("username", username);
+        String password = rabbitmqConfig.getPassword();
+        velocityContext.put("password", password);
         String queuename = rabbitmqConfig.getQueueName();
         velocityContext.put("queue", queuename);
         String host = rabbitmqConfig.getHost();
@@ -238,8 +242,6 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         velocityContext.put("autodelete", autodelete.toString());
         Boolean usetransactions = rabbitmqConfig.isUseTransactions();
         velocityContext.put("transaction", usetransactions.toString());
-        //Terminar función, llamarla en configurationBody y viewConfiguration. Quizás también en configurationHeader, ver esto.
-
     }
 
     @Override

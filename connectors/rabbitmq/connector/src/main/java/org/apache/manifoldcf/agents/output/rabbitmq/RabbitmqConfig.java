@@ -43,10 +43,10 @@ public class RabbitmqConfig extends RabbitParameters{
     private String defaultAutoDelete = "false";
     private String defaultUseTransactions = "false";
 */
-    private static Parameters[] PARAMETERSLIST = {Parameters.host, Parameters.queue, Parameters.durable, Parameters.autodelete,
+    private static Parameters[] PARAMETERSLIST = {Parameters.username, Parameters.password, Parameters.host, Parameters.queue, Parameters.durable, Parameters.autodelete,
                                                     Parameters.port, Parameters.exclusive, Parameters.transaction};
 
-    RabbitmqConfig(ConfigParams configParams) {
+    public RabbitmqConfig(ConfigParams configParams) {
         super(Parameters.class);
         for (Parameters parameters : PARAMETERSLIST){
             String p = configParams.getParameter(parameters.name());
@@ -78,6 +78,10 @@ public class RabbitmqConfig extends RabbitParameters{
         }
         return Integer.parseInt(portParam);
     }
+
+    public String getUserName() {return get(Parameters.username);}
+
+    protected String getPassword() {return get(Parameters.password);}
 
     public boolean isDurable() {
         return Boolean.parseBoolean(get(Parameters.durable));

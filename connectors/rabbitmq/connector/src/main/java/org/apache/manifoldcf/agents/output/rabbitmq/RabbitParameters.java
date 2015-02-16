@@ -11,6 +11,8 @@ class RabbitParameters extends EnumMap <RabbitParameters.Parameters, String> {
 
     public RabbitParameters(Class<Parameters> keyType) {
         super(keyType);
+        this.put(Parameters.username, "username");
+        this.put(Parameters.password, "password");
         this.put(Parameters.host, "host");
         this.put(Parameters.queue, "queue");
         this.put(Parameters.port, "5672");
@@ -21,7 +23,7 @@ class RabbitParameters extends EnumMap <RabbitParameters.Parameters, String> {
     }
 
     public enum Parameters  {
-        host, queue, port, durable, autodelete, exclusive, transaction
+        username, password, host, queue, port, durable, autodelete, exclusive, transaction
     }
 
 }
