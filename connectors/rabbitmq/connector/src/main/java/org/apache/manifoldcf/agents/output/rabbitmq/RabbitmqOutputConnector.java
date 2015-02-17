@@ -131,6 +131,7 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
                 factory.setPassword(rabbitconfig.getPassword());
                 connection = factory.newConnection();
                 channel = connection.createChannel();
+                System.out.println("Channel created.");
             }
             catch (IOException e){
                 Logging.ingest.warn("Session set up error: "+e.getMessage(), e);
@@ -152,14 +153,14 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         try
         {
             Channel auxchan = getSession();
-            auxchan.queueDeclare("OK_QUEUE",false,true,true,null);
+            auxchan.queueDeclare(rabbitconfig.getQueueName(),rabbitconfig.isDurable(),rabbitconfig.isExclusive(), rabbitconfig.isAutoDelete(),null);
             String message = "OK";
             auxchan.basicPublish("", "OK_QUEUE", null, message.getBytes());
             return super.check();
         }
         catch (IOException e){
             Logging.ingest.warn("Error checking channel: "+e.getMessage(),e);
-            return "Error: "+e.getMessage();
+            return "Error while checking: "+e.getMessage();
         }
         catch (ServiceInterruption e)
         {
