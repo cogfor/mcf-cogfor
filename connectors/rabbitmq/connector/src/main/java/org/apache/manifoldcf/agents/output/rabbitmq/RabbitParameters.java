@@ -16,10 +16,10 @@ class RabbitParameters extends EnumMap <RabbitParameters.Parameters, String> {
         this.put(Parameters.host, "host");
         this.put(Parameters.queue, "queue");
         this.put(Parameters.port, "5672");
-        this.put(Parameters.durable, "true");
-        this.put(Parameters.autodelete, "false");
-        this.put(Parameters.exclusive, "true");
-        this.put(Parameters.transaction, "false");
+        this.put(Parameters.durable, "");
+        this.put(Parameters.autodelete, "");
+        this.put(Parameters.exclusive, "");
+        this.put(Parameters.transaction, "");
     }
 
     public enum Parameters  {

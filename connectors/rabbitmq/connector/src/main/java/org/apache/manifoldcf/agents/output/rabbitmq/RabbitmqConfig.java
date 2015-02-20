@@ -63,6 +63,8 @@ public class RabbitmqConfig extends RabbitParameters{
         }
     }
 
+
+
     public String getQueueName() {
         return get(Parameters.queue);
     }

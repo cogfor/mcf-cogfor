@@ -48,7 +48,7 @@ import java.io.*;
 public class RabbitmqOutputConnector extends BaseOutputConnector {
     public static final String _rcsid = "@(#)$Id: RabbitmqOutputConnector.java 988245 2010-08-23 18:39:35Z kwright $";
 
-    RabbitmqConfig rabbitconfig;
+    RabbitmqConfig rabbitconfig = null;
 
     // Activities we log
 
@@ -66,6 +66,12 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
     private Connection connection = null;
     private Channel channel = null;
     //private long expirationTime = -1L;
+
+//    private class PreviousQueueConfig {
+//        Boolean isDurable;
+//        Boolean isExclusive;
+//        Boolean isAutodelete;
+//    }
 
     /** Constructor.
      */
@@ -116,7 +122,7 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
     protected Channel getSession()
             throws ManifoldCFException, ServiceInterruption
     {
-        if (channel == null){
+        if (this.channel == null){
             try{
                 //First check if rabbitconfig is empty, if it is, we fill it with the configuration parameters:
                 if (rabbitconfig == null) {
@@ -129,9 +135,9 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
                 factory.setPort(rabbitconfig.getPort());
                 factory.setUsername(rabbitconfig.getUserName());
                 factory.setPassword(rabbitconfig.getPassword());
-                connection = factory.newConnection();
-                channel = connection.createChannel();
-                System.out.println("Channel created.");
+                this.connection = factory.newConnection();
+                this.channel = connection.createChannel();
+//                System.out.println("Channel created." + rabbitconfig.isDurable() + rabbitconfig.isExclusive()+rabbitconfig.isAutoDelete() );
             }
             catch (IOException e){
                 Logging.ingest.warn("Session set up error: "+e.getMessage(), e);
@@ -140,8 +146,12 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         }
         //Reset time:
         //expirationTime = System.currentTimeMillis() + EXPIRATION_INTERVAL;
-        return channel;
+        return this.channel;
     }
+
+//    private UpdateQueueParameters(){
+//
+//    }
 
     /** Test the connection.  Returns a string describing the connection integrity.
      *@return the connection's status as a displayable string.
@@ -152,16 +162,27 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
     {
         try
         {
-            Channel auxchan = getSession();
-            auxchan.queueDeclare(rabbitconfig.getQueueName(),rabbitconfig.isDurable(),rabbitconfig.isExclusive(), rabbitconfig.isAutoDelete(),null);
-            String message = "OK";
-            auxchan.basicPublish("", "OK_QUEUE", null, message.getBytes());
+            // Establish a session:
+            Channel channel = getSession();
+
+            //Declare a queue for publish:
+//            String name = rabbitconfig.getQueueName();
+////            channel.queueDelete(name);
+//            Boolean durable = rabbitconfig.isDurable();
+//            Boolean exclusive = rabbitconfig.isExclusive();
+//            Boolean autodelete = rabbitconfig.isAutoDelete();
+//            System.out.println("Checking." + durable + exclusive + autodelete);
+//            channel.queueDeclare(name, durable, exclusive, autodelete, null);
+//
+//
+//            String message = "OK";
+//            channel.basicPublish("", "OK_QUEUE", null, message.getBytes());
             return super.check();
         }
-        catch (IOException e){
-            Logging.ingest.warn("Error checking channel: "+e.getMessage(),e);
-            return "Error while checking: "+e.getMessage();
-        }
+//        catch (IOException e){
+//            Logging.ingest.warn("Error checking channel: "+e.getMessage(),e);
+//            return "Error while checking: "+e.getMessage();
+//        }
         catch (ServiceInterruption e)
         {
             return "Transient error: "+e.getMessage();
@@ -214,12 +235,24 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         Messages.outputResourceWithVelocity(out, locale, "ConfigurationBody.html", velocityContext, false);
     }
 
+//    private void updateQueueConfiguration(String queueName) throws  ManifoldCFException {
+//        try{
+//            channel.queueDelete(queueName);
+//            System.out.println("Queue deleted");
+//        }
+//        catch (IOException e){
+//            Logging.ingest.warn("Error updating queue: " + e.getMessage(), e);
+//            throw new ManifoldCFException("Error updating queue: " + e.getMessage(), e);
+//        }
+//
+//    }
 
     @Override
     public String processConfigurationPost(IThreadContext threadContext,
                                            IPostParameters variableContext, ConfigParams parameters)
         throws ManifoldCFException{
         RabbitmqConfig.contextToConfig(variableContext, parameters);
+        System.out.println("processing configuration post.");
         return null;
     }
 
@@ -330,7 +363,7 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
             }
             else{
                 Logging.ingest.warn("Unhandled security type" + securityType);
-                result = "Document rejected.";
+                result = "Document rejected due to unhandled security type.";
                 activities.recordActivity(null, INGEST_ACTIVITY, new Long(document.getBinaryLength()), documentURI, result, null);
             }
 
@@ -366,6 +399,8 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
             Boolean exclusive = rabbitconfig.isExclusive();
             Boolean autodelete = rabbitconfig.isAutoDelete();
             channel.queueDeclare(QUEUE_NAME, durable, exclusive, autodelete, null);
+
+            System.out.println("QUEUE created." + rabbitconfig.isDurable() + rabbitconfig.isExclusive()+rabbitconfig.isAutoDelete() );
 
             //Publish the content of the document:
             Boolean useTransactions = rabbitconfig.isUseTransactions();
