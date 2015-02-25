@@ -4,8 +4,6 @@ package org.apache.manifoldcf.agents.output.rabbitmq;
  * Created by mariana on 2/2/15.
  */
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
 
 class RabbitParameters extends EnumMap <RabbitParameters.Parameters, String> {
 

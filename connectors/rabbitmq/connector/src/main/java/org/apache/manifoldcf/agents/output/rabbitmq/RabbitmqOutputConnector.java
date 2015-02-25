@@ -67,12 +67,6 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
     private Channel channel = null;
     //private long expirationTime = -1L;
 
-//    private class PreviousQueueConfig {
-//        Boolean isDurable;
-//        Boolean isExclusive;
-//        Boolean isAutodelete;
-//    }
-
     /** Constructor.
      */
     public RabbitmqOutputConnector()
@@ -119,7 +113,7 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
     }
 
     /** Set up a session */
-    protected Channel getSession()
+    protected void getSession()
             throws ManifoldCFException, ServiceInterruption
     {
         if (this.channel == null){
@@ -135,9 +129,9 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
                 factory.setPort(rabbitconfig.getPort());
                 factory.setUsername(rabbitconfig.getUserName());
                 factory.setPassword(rabbitconfig.getPassword());
+                factory.setRequestedHeartbeat(120);
                 this.connection = factory.newConnection();
                 this.channel = connection.createChannel();
-//                System.out.println("Channel created." + rabbitconfig.isDurable() + rabbitconfig.isExclusive()+rabbitconfig.isAutoDelete() );
             }
             catch (IOException e){
                 Logging.ingest.warn("Session set up error: "+e.getMessage(), e);
@@ -146,7 +140,6 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         }
         //Reset time:
         //expirationTime = System.currentTimeMillis() + EXPIRATION_INTERVAL;
-        return this.channel;
     }
 
 //    private UpdateQueueParameters(){
@@ -163,26 +156,10 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         try
         {
             // Establish a session:
-            Channel channel = getSession();
-
-            //Declare a queue for publish:
-//            String name = rabbitconfig.getQueueName();
-////            channel.queueDelete(name);
-//            Boolean durable = rabbitconfig.isDurable();
-//            Boolean exclusive = rabbitconfig.isExclusive();
-//            Boolean autodelete = rabbitconfig.isAutoDelete();
-//            System.out.println("Checking." + durable + exclusive + autodelete);
-//            channel.queueDeclare(name, durable, exclusive, autodelete, null);
-//
-//
-//            String message = "OK";
-//            channel.basicPublish("", "OK_QUEUE", null, message.getBytes());
+            getSession();
+            connection.getHeartbeat();
             return super.check();
         }
-//        catch (IOException e){
-//            Logging.ingest.warn("Error checking channel: "+e.getMessage(),e);
-//            return "Error while checking: "+e.getMessage();
-//        }
         catch (ServiceInterruption e)
         {
             return "Transient error: "+e.getMessage();
@@ -235,24 +212,13 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         Messages.outputResourceWithVelocity(out, locale, "ConfigurationBody.html", velocityContext, false);
     }
 
-//    private void updateQueueConfiguration(String queueName) throws  ManifoldCFException {
-//        try{
-//            channel.queueDelete(queueName);
-//            System.out.println("Queue deleted");
-//        }
-//        catch (IOException e){
-//            Logging.ingest.warn("Error updating queue: " + e.getMessage(), e);
-//            throw new ManifoldCFException("Error updating queue: " + e.getMessage(), e);
-//        }
-//
-//    }
+
 
     @Override
     public String processConfigurationPost(IThreadContext threadContext,
                                            IPostParameters variableContext, ConfigParams parameters)
         throws ManifoldCFException{
         RabbitmqConfig.contextToConfig(variableContext, parameters);
-        System.out.println("processing configuration post.");
         return null;
     }
 
@@ -317,23 +283,7 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
      *          is the activities object, so we can report what's happening.
      * @return the modified ACL.
      */
-    protected static String[] convertACL(String[] acl,
-                                         String authorityNameString, IOutputAddActivity activities)
-            throws ManifoldCFException
-    {
-        if (acl != null)
-        {
-            String[] rval = new String[acl.length];
-            int i = 0;
-            while (i < rval.length)
-            {
-                rval[i] = activities.qualifyAccessToken(authorityNameString, acl[i]);
-                i++;
-            }
-            return rval;
-        }
-        return new String[0];
-    }
+
 
     @Override
     public int addOrReplaceDocumentWithException(String documentURI, VersionContext outputDescription, RepositoryDocument document, String authorityNameString, IOutputAddActivity activities)
@@ -348,20 +298,33 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         String[] denyAcls = null;
         String[] shareAcls = null;
         String[] shareDenyAcls = null;
+        String[] parentAcls = null;
+        String[] parentDenyAcls = null;
+
         Iterator <String> iterator = document.securityTypesIterator();
         while (iterator.hasNext()){
             String securityType = iterator.next();
-            String[] convertedAcls = convertACL(document.getSecurityACL(securityType), authorityNameString, activities);
-            String[] convertedDenyAcls = convertACL(document.getSecurityDenyACL(securityType), authorityNameString, activities);
-            if (securityType.equals(RepositoryDocument.SECURITY_TYPE_DOCUMENT)){
-                acls = convertedAcls;
-                denyAcls = convertedDenyAcls;
+//            String[] convertedAcls = convertACL(document.getSecurityACL(securityType), authorityNameString, activities);
+//            String[] convertedDenyAcls = convertACL(document.getSecurityDenyACL(securityType), authorityNameString, activities);
+//            System.out.println("Security type:" + securityType);
+//            if (securityType.equals(RepositoryDocument.SECURITY_TYPE_DOCUMENT)){
+//                acls = convertedAcls;
+//                denyAcls = convertedDenyAcls;
+//            }
+//            else if(securityType.equals(RepositoryDocument.SECURITY_TYPE_SHARE)){
+//                shareAcls = convertedAcls;
+//                shareDenyAcls = convertedDenyAcls;
+//            }
+//            else if(securityType.equals(RepositoryDocument.SECURITY_TYPE_PARENT)){
+//                parentAcls = convertedAcls;
+//            }
+////            else if {
+////
+////            }
+            if (securityType.equals(RepositoryDocument.SECURITY_TYPE_DIRECTORY_LEVEL)){
+
             }
-            if(securityType.equals(RepositoryDocument.SECURITY_TYPE_SHARE)){
-                shareAcls = convertedAcls;
-                shareDenyAcls = convertedDenyAcls;
-            }
-            else{
+            else {
                 Logging.ingest.warn("Unhandled security type" + securityType);
                 result = "Document rejected due to unhandled security type.";
                 activities.recordActivity(null, INGEST_ACTIVITY, new Long(document.getBinaryLength()), documentURI, result, null);
@@ -372,7 +335,8 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         // Fill an OutboundDocument instance.
         OutboundDocument outboundDocument = new OutboundDocument(document);
         outboundDocument.setDocumentURI(documentURI);
-        Writer writer = new Writer() {
+        Writer writer = new Writer()
+        {
             @Override
             public void write(char[] cbuf, int off, int len) throws IOException {
 
@@ -392,7 +356,7 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
             String outString = outboundDocument.writeTo(writer);
 
             // Establish a session:
-            Channel channel = getSession();
+            getSession();
 
             //Declare a queue for publish:
             Boolean durable = rabbitconfig.isDurable();
@@ -400,7 +364,6 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
             Boolean autodelete = rabbitconfig.isAutoDelete();
             channel.queueDeclare(QUEUE_NAME, durable, exclusive, autodelete, null);
 
-            System.out.println("QUEUE created." + rabbitconfig.isDurable() + rabbitconfig.isExclusive()+rabbitconfig.isAutoDelete() );
 
             //Publish the content of the document:
             Boolean useTransactions = rabbitconfig.isUseTransactions();
@@ -440,7 +403,7 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
             throws ManifoldCFException, ServiceInterruption
     {
         // Establish a session
-        Channel channel = getSession();
+        getSession();
         activities.recordActivity(null,REMOVE_ACTIVITY,null,documentURI,"OK",null);
     }
 
