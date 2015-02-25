@@ -270,21 +270,6 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
      *@return the document status (accepted or permanently rejected).
      */
 
-
-    /**
-     * Convert an unqualified ACL to qualified form.
-     *
-     * @param acl
-     *          is the initial, unqualified ACL.
-     * @param authorityNameString
-     *          is the name of the governing authority for this document's acls,
-     *          or null if none.
-     * @param activities
-     *          is the activities object, so we can report what's happening.
-     * @return the modified ACL.
-     */
-
-
     @Override
     public int addOrReplaceDocumentWithException(String documentURI, VersionContext outputDescription, RepositoryDocument document, String authorityNameString, IOutputAddActivity activities)
             throws ManifoldCFException, ServiceInterruption, IOException
@@ -293,65 +278,31 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         String result = "OK";
         long startTime = System.currentTimeMillis();
 
-        // Check ACL's.
-        String[] acls = null;
-        String[] denyAcls = null;
-        String[] shareAcls = null;
-        String[] shareDenyAcls = null;
-        String[] parentAcls = null;
-        String[] parentDenyAcls = null;
-
-        Iterator <String> iterator = document.securityTypesIterator();
-        while (iterator.hasNext()){
-            String securityType = iterator.next();
-//            String[] convertedAcls = convertACL(document.getSecurityACL(securityType), authorityNameString, activities);
-//            String[] convertedDenyAcls = convertACL(document.getSecurityDenyACL(securityType), authorityNameString, activities);
-//            System.out.println("Security type:" + securityType);
-//            if (securityType.equals(RepositoryDocument.SECURITY_TYPE_DOCUMENT)){
-//                acls = convertedAcls;
-//                denyAcls = convertedDenyAcls;
-//            }
-//            else if(securityType.equals(RepositoryDocument.SECURITY_TYPE_SHARE)){
-//                shareAcls = convertedAcls;
-//                shareDenyAcls = convertedDenyAcls;
-//            }
-//            else if(securityType.equals(RepositoryDocument.SECURITY_TYPE_PARENT)){
-//                parentAcls = convertedAcls;
-//            }
-////            else if {
-////
-////            }
-            if (securityType.equals(RepositoryDocument.SECURITY_TYPE_DIRECTORY_LEVEL)){
-
-            }
-            else {
-                Logging.ingest.warn("Unhandled security type" + securityType);
-                result = "Document rejected due to unhandled security type.";
-                activities.recordActivity(null, INGEST_ACTIVITY, new Long(document.getBinaryLength()), documentURI, result, null);
-            }
-
+        RabbitSecurityService rabbitSecurityService = new RabbitSecurityService(document, authorityNameString, activities, documentURI);
+        if (rabbitSecurityService.getResult() != "OK"){
+            return DOCUMENTSTATUS_REJECTED;
         }
 
         // Fill an OutboundDocument instance.
         OutboundDocument outboundDocument = new OutboundDocument(document);
         outboundDocument.setDocumentURI(documentURI);
-        Writer writer = new Writer()
-        {
-            @Override
-            public void write(char[] cbuf, int off, int len) throws IOException {
-
-            }
-
-            @Override
-            public void flush() throws IOException {
-
-            }
-
-            @Override
-            public void close() throws IOException {
-
-            }
-        };
+        StringWriter writer = new StringWriter();
+//        {
+//            @Override
+//            public void write(char[] cbuf, int off, int len) throws IOException {
+//
+//            }
+//
+//            @Override
+//            public void flush() throws IOException {
+//
+//            }
+//
+//            @Override
+//            public void close() throws IOException {
+//
+//            }
+//        };
         try {
             String outString = outboundDocument.writeTo(writer);
 
@@ -382,7 +333,7 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         }
         catch(JSONException e){
             Logging.ingest.warn("JSON exception: "+e.getMessage(), e);
-            result = "Document rejected.";
+            result = "Document rejected due to JSON exception.";
             return DOCUMENTSTATUS_REJECTED;
         }
         finally {
