@@ -3,7 +3,7 @@ package org.apache.manifoldcf.agents.output.rabbitmq.tests;
 /**
  * Created by mariana on 2/6/15.
  */
-public class BaseITHSQLDB {
+public class BaseITHSQLDB extends org.apache.manifoldcf.crawler.tests.BaseITHSQLDB{
     protected String[] getConnectorNames()
     {
         return new String[]{"Test Connector"};

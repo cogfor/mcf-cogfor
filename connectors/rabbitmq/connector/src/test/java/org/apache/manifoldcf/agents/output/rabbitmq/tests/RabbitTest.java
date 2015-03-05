@@ -1,5 +1,9 @@
 package org.apache.manifoldcf.agents.output.rabbitmq.tests;
 
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+
 import org.apache.manifoldcf.core.interfaces.*;
 import org.apache.manifoldcf.agents.interfaces.*;
 import org.apache.manifoldcf.crawler.interfaces.*;
@@ -7,14 +11,33 @@ import org.junit.*;
 
 import org.apache.manifoldcf.agents.output.rabbitmq.RabbitmqConfig;
 
+import java.io.IOException;
+
 /**
  * Created by mariana on 2/6/15.
  */
 public class RabbitTest extends BaseITHSQLDB {
+    protected ConnectionFactory connectionFactory= new ConnectionFactory();
+    protected Connection connection;
+    protected Channel channel;
+
+    public RabbitTest(){
+        try {
+            this.connection = connectionFactory.newConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Before
-    public void setRabbitConnector(){
-
+    public void setMockRabbitConnector(){
+        connectionFactory.setHost("localhost");
+        connectionFactory.setPort(5672);
+        try {
+            this.channel = connection.createChannel();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -62,15 +85,32 @@ public class RabbitTest extends BaseITHSQLDB {
         job.setHopcountMode(job.HOPCOUNT_NEVERDELETE);
         jobManager.save(job);
 
-        //Start job.
+        try {
+            //Start job.
+            long startTime = System.currentTimeMillis();
+            jobManager.manualStart(job.getID());
+            mcfInstance.waitJobInactiveNative(jobManager, job.getID(), 1000000L);
+            System.err.println("Crawl activity required " + new Long(System.currentTimeMillis() - startTime).toString() + " milliseconds");
 
-        //Check number of documents sent.
-
-
+            //Check number of documents sent.
+            JobStatus status = jobManager.getStatus(job.getID());
+            if (status.getDocumentsProcessed() != 3)
+               throw new ManifoldCFException("Wrong number of documents. Expected 3 but saw " + new Long(status.getDocumentsProcessed()).toString());
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @After
-    public void cleanRabbitConnector(){
+    public void cleanMockRabbitConnector(){
+        try {
+            this.channel.close();
+            this.connection.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 }

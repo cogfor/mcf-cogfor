@@ -287,22 +287,6 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         OutboundDocument outboundDocument = new OutboundDocument(document);
         outboundDocument.setDocumentURI(documentURI);
         StringWriter writer = new StringWriter();
-//        {
-//            @Override
-//            public void write(char[] cbuf, int off, int len) throws IOException {
-//
-//            }
-//
-//            @Override
-//            public void flush() throws IOException {
-//
-//            }
-//
-//            @Override
-//            public void close() throws IOException {
-//
-//            }
-//        };
         try {
             String outString = outboundDocument.writeTo(writer);
 
