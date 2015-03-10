@@ -116,14 +116,15 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
     protected void getSession()
             throws ManifoldCFException, ServiceInterruption
     {
+        //First check if rabbitconfig is empty, if it is, we fill it with the configuration parameters:
+        if (rabbitconfig == null) {
+            ConfigParams configParams = getConfiguration();
+            this.rabbitconfig = new RabbitmqConfig(configParams);
+        }
+
+        //If the channel is null, we use the current configuration to create one:
         if (this.channel == null){
             try{
-                //First check if rabbitconfig is empty, if it is, we fill it with the configuration parameters:
-                if (rabbitconfig == null) {
-                    ConfigParams configParams = getConfiguration();
-                    this.rabbitconfig = new RabbitmqConfig(configParams);
-                }
-
                 //Create a channel:
                 factory.setHost(rabbitconfig.getHost());
                 factory.setPort(rabbitconfig.getPort());
@@ -274,6 +275,10 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
     public int addOrReplaceDocumentWithException(String documentURI, VersionContext outputDescription, RepositoryDocument document, String authorityNameString, IOutputAddActivity activities)
             throws ManifoldCFException, ServiceInterruption, IOException
     {
+        // Establish a session:
+        getSession();
+
+        //Set up some parameters:
         String QUEUE_NAME = rabbitconfig.getQueueName();
         String result = "OK";
         long startTime = System.currentTimeMillis();
@@ -289,9 +294,6 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         StringWriter writer = new StringWriter();
         try {
             String outString = outboundDocument.writeTo(writer);
-
-            // Establish a session:
-            getSession();
 
             //Declare a queue for publish:
             Boolean durable = rabbitconfig.isDurable();
