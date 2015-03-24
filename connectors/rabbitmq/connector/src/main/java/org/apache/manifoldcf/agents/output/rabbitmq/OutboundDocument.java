@@ -27,6 +27,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterOutputStream;
@@ -56,8 +57,6 @@ public class OutboundDocument {
     public OutboundDocument(RepositoryDocument document) {
         this.document = document;
         this.inputStream = document.getBinaryStream();
-
-
     }
 
     public OutboundDocument() {
@@ -123,10 +122,20 @@ public class OutboundDocument {
         this.operation = operation;
     }
 
-    public String writeTo(Writer out) throws JSONException, IOException, ManifoldCFException {
+    protected void WriteACLs (JSONObject jsonObject, Map<String, String[]> mapedAcls, Map<String, String[]> mapedDenyAcls) throws JSONException {
+        for (Map.Entry<String, String[]> entry : mapedAcls.entrySet()){
+            jsonObject.put(allowAttributeName + " , " + entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, String[]> entry : mapedDenyAcls.entrySet()){
+            jsonObject.put(denyAttributeName + " , " + entry.getKey(), entry.getValue());
+        }
+    }
+
+    public String writeTo(Writer out, Map<String, String[]> mapedAcls, Map<String, String[]> mapedDenyAcls) throws JSONException, IOException, ManifoldCFException {
         JSONObject json = new JSONObject();
 
         json.put("documentUri", this.documentURI);
+        WriteACLs(json, mapedAcls, mapedDenyAcls);
         //json.put("acl", this.document.getSecurityACL());
         //json.put("acl", this.document.getACL());
         //json.put("acl_deny", this.document.getDenyACL());

@@ -94,6 +94,7 @@
     <module>test-materials</module>
     <module>connectors</module>
     <module>framework/jetty-runner</module>
+    <module>framework/build/war-proprietary</module>
   </modules>
 
   <build>

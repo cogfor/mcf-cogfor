@@ -20,12 +20,15 @@ public class RabbitSecurityService {
 
     protected String getResult (){return RESULT;}
 
-    private void mapAcls (String securityType, String[] acls, String[] denyAcls){
+    protected void mapAcls (String securityType, String[] acls, String[] denyAcls){
         this.mapedAcls = new HashMap<String, String[]>();
         this.mapedDenyAcls = new HashMap<String, String[]>();
         this.mapedAcls.put(securityType, acls);
         this.mapedDenyAcls.put(securityType, denyAcls);
     }
+
+    protected Map<String, String[]> getMapedAcls (){return mapedAcls;}
+    protected Map<String, String[]> getMapedDenyAcls () {return mapedDenyAcls;}
 
     protected static String[] convertACL(String[] acl,
                                          String authorityNameString, IOutputAddActivity activities)

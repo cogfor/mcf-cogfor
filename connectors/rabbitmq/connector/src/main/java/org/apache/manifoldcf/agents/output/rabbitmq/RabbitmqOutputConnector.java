@@ -291,9 +291,11 @@ public class RabbitmqOutputConnector extends BaseOutputConnector {
         // Fill an OutboundDocument instance.
         OutboundDocument outboundDocument = new OutboundDocument(document);
         outboundDocument.setDocumentURI(documentURI);
+        Map<String, String[]> mapedAcls = rabbitSecurityService.getMapedAcls();
+        Map<String, String[]> mapedDenyAcls = rabbitSecurityService.getMapedDenyAcls();
         StringWriter writer = new StringWriter();
         try {
-            String outString = outboundDocument.writeTo(writer);
+            String outString = outboundDocument.writeTo(writer, mapedAcls, mapedDenyAcls);
 
             //Declare a queue for publish:
             Boolean durable = rabbitconfig.isDurable();
