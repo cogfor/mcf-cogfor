@@ -33,37 +33,38 @@
 
   <modules>
     <!-- common modules -->
-    <module>activedirectory</module>
-    <module>alfresco-webscript</module>
-    <module>filesystem</module>
-    <module>gts</module>
-    <module>hdfs</module>
-    <module>jcifs</module>
-    <module>jdbc</module>
-    <module>gridfs</module>
-    <module>ldap</module>
-    <module>nullauthority</module>
-    <module>nulloutput</module>
-    <module>nulltransformation</module>
-    <module>rss</module>
-    <module>sharepoint</module>
-    <module>solr</module>
-    <module>webcrawler</module>
-    <module>cmis</module>
-    <module>opensearchserver</module>
-    <module>wiki</module>
-    <module>alfresco</module>
-    <module>elasticsearch</module>
-    <module>dropbox</module>
-    <module>googledrive</module>
-    <module>jira</module>
-    <module>generic</module>
-    <module>regexpmapper</module>
-    <module>email</module>
-    <module>amazoncloudsearch</module>
-    <module>forcedmetadata</module>
-    <module>tika</module>
-    <module>documentfilter</module>
+      <module>activedirectory</module>
+      <module>alfresco-webscript</module>
+      <module>filesystem</module>
+      <module>gts</module>
+      <module>hdfs</module>
+      <module>jcifs</module>
+      <module>jdbc</module>
+      <module>gridfs</module>
+      <module>ldap</module>
+      <module>nullauthority</module>
+      <module>nulloutput</module>
+      <module>nulltransformation</module>
+      <module>rabbitmq</module>
+      <module>rss</module>
+      <module>sharepoint</module>
+      <module>solr</module>
+      <module>webcrawler</module>
+      <module>cmis</module>
+      <module>opensearchserver</module>
+      <module>wiki</module>
+      <module>alfresco</module>
+      <module>elasticsearch</module>
+      <module>dropbox</module>
+      <module>googledrive</module>
+      <module>jira</module>
+      <module>generic</module>
+      <module>regexpmapper</module>
+      <module>email</module>
+      <module>amazoncloudsearch</module>
+      <module>forcedmetadata</module>
+      <module>tika</module>
+      <module>documentfilter</module>
   </modules>
 
 </project>

@@ -153,26 +153,7 @@ public class NavigationTest extends BaseUIHSQLDB {
         selectbox.selectValue(testerInstance.createStringDescription("MyRepositoryConnection"));
         button = window.findButton(testerInstance.createStringDescription("Continue to next screen"));
         button.click();
-        // Visit all the tabs.  Scheduling tab first
-        /*window = testerInstance.findWindow(null);
-        link = window.findLink(testerInstance.createStringDescription("Scheduling tab"));
-        link.click();
-        window = testerInstance.findWindow(null);
-        form = window.findForm(testerInstance.createStringDescription("editjob"));
-        selectbox = form.findSelectbox(testerInstance.createStringDescription("dayofweek"));
-        selectbox.selectValue(testerInstance.createStringDescription("0"));
-        selectbox = form.findSelectbox(testerInstance.createStringDescription("hourofday"));
-        selectbox.selectValue(testerInstance.createStringDescription("1"));
-        selectbox = form.findSelectbox(testerInstance.createStringDescription("minutesofhour"));
-        selectbox.selectValue(testerInstance.createStringDescription("30"));
-        selectbox = form.findSelectbox(testerInstance.createStringDescription("monthofyear"));
-        selectbox.selectValue(testerInstance.createStringDescription("11"));
-        selectbox = form.findSelectbox(testerInstance.createStringDescription("dayofmonth"));
-        selectbox.selectValue(testerInstance.createStringDescription("none"));
-        textarea = form.findTextarea(testerInstance.createStringDescription("duration"));
-        textarea.setValue(testerInstance.createStringDescription("120"));
-        button = window.findButton(testerInstance.createStringDescription("Add new schedule record"));
-        button.click();*/
+
         window = testerInstance.findWindow(null);
         // MHL
         // Save the job

@@ -7,6 +7,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import org.apache.manifoldcf.core.interfaces.*;
 import org.apache.manifoldcf.agents.interfaces.*;
 import org.apache.manifoldcf.crawler.interfaces.*;
+import org.apache.manifoldcf.crawler.system.ManifoldCF;
 import org.junit.*;
 
 import org.apache.manifoldcf.agents.output.rabbitmq.RabbitmqConfig;
@@ -16,32 +17,18 @@ import java.io.IOException;
 /**
  * Created by mariana on 2/6/15.
  */
-public class RabbitTest extends BaseITHSQLDB {
-    protected ConnectionFactory connectionFactory= new ConnectionFactory();
-    protected Connection connection;
-    protected Channel channel;
+public class RabbitTest extends BaseITHSQLDB{
 
-    public RabbitTest(){
-        try {
-            this.connection = connectionFactory.newConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    //protected org.apache.manifoldcf.crawler.tests.ManifoldCFInstance instance;
 
-    @Before
-    public void setMockRabbitConnector(){
-        connectionFactory.setHost("localhost");
-        connectionFactory.setPort(5672);
-        try {
-            this.channel = connection.createChannel();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    //public RabbitTest(org.apache.manifoldcf.crawler.tests.ManifoldCFInstance instance)
+    //{
+      //  this.instance = instance;
+    //}
+    public RabbitTest(){}
 
     @Test
-    public void testRabbitCrawler() throws Exception
+    public void executeTest() throws Exception
     {
         IThreadContext threadContext = ThreadContextFactory.make();
 
@@ -65,6 +52,8 @@ public class RabbitTest extends BaseITHSQLDB {
         // Set the connection parameters
         ConfigParams configParams = outputConn.getConfigParams();
         RabbitmqConfig rabbitmqConfig = new RabbitmqConfig(configParams);
+        configParams.setParameter("username", "guest");
+        configParams.setParameter("password", "guest");
         configParams.setParameter("host", "localhost");
         configParams.setParameter("queue", "Queue_3");
         configParams.setParameter("port", "5672");
@@ -83,34 +72,33 @@ public class RabbitTest extends BaseITHSQLDB {
         job.setType(job.TYPE_SPECIFIED);
         job.setStartMethod(job.START_DISABLE);
         job.setHopcountMode(job.HOPCOUNT_NEVERDELETE);
+
+        Specification ds = job.getSpecification();
+        SpecificationNode sn = new SpecificationNode("documentcount");
+        sn.setAttribute("count","111");
+        ds.addChild(ds.getChildCount(),sn);
         jobManager.save(job);
 
-        try {
-            //Start job.
+        try
+        {
+            // Now, start the job, and wait until it completes.
             long startTime = System.currentTimeMillis();
             jobManager.manualStart(job.getID());
-            mcfInstance.waitJobInactiveNative(jobManager, job.getID(), 1000000L);
-            System.err.println("Crawl activity required " + new Long(System.currentTimeMillis() - startTime).toString() + " milliseconds");
-
-            //Check number of documents sent.
-            JobStatus status = jobManager.getStatus(job.getID());
-            if (status.getDocumentsProcessed() != 3)
-               throw new ManifoldCFException("Wrong number of documents. Expected 3 but saw " + new Long(status.getDocumentsProcessed()).toString());
+            mcfInstance.waitJobInactiveNative(jobManager, job.getID(), 300000L);
+            System.err.println("Crawl required "+new Long(System.currentTimeMillis()-startTime).toString()+" milliseconds");
         }
         catch (Exception e){
             e.printStackTrace();
             throw e;
         }
-    }
 
-    @After
-    public void cleanMockRabbitConnector(){
-        try {
-            this.channel.close();
-            this.connection.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        JobStatus status = jobManager.getStatus(job.getID());
+        if (status.getDocumentsProcessed() != 111)
+            new ManifoldCFException("Wrong number of documents processed - expected 111, saw "+new Long(status.getDocumentsProcessed()).toString());
+
+        jobManager.deleteJob(job.getID());
+        mcfInstance.waitJobDeletedNative(jobManager, job.getID(), 300000L);
 
     }
+
 }

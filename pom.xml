@@ -90,11 +90,11 @@
   </properties>
 
   <modules>
-    <module>framework</module>
-    <module>test-materials</module>
-    <module>connectors</module>
-    <module>framework/jetty-runner</module>
-    <module>framework/build/war-proprietary</module>
+      <module>framework</module>
+      <module>framework/jetty-runner</module>
+      <module>test-materials</module>
+      <module>connectors</module>
+      <module>framework/build/war-proprietary</module>
   </modules>
 
   <build>

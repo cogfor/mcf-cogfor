@@ -44,7 +44,6 @@
     <module>crawler-ui</module>
     <module>script-engine</module>
     <module>combined-service</module>
-    <module>build</module>
   </modules>
 
 </project>
