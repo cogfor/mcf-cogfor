@@ -134,7 +134,7 @@ public class OutboundDocument {
     public String writeTo(Writer out, Map<String, String[]> mapedAcls, Map<String, String[]> mapedDenyAcls) throws JSONException, IOException, ManifoldCFException {
         JSONObject json = new JSONObject();
 
-        json.put("documentUri", this.documentURI);
+        json.put("id", this.documentURI);
         WriteACLs(json, mapedAcls, mapedDenyAcls);
         //json.put("acl", this.document.getSecurityACL());
         //json.put("acl", this.document.getACL());
@@ -199,7 +199,7 @@ public class OutboundDocument {
         }
 
 
-        this.documentURI = json.getString("documentUri");
+        this.documentURI = json.getString("id");
 
 
         if (json.has("fields")) {
